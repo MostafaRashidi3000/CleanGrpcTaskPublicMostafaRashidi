@@ -1,0 +1,18 @@
+syntax = "proto3";
+option csharp_namespace = "Rira.PersonService.Grpc";
+package rira.person.v1;
+service PersonService {
+ rpc CreatePerson(CreatePersonRequest) returns (PersonReply);
+ rpc GetPerson(GetPersonRequest) returns (PersonReply);
+ rpc ListPersons(ListPersonsRequest) returns (ListPersonsReply);
+ rpc UpdatePerson(UpdatePersonRequest) returns (PersonReply);
+ rpc DeletePerson(DeletePersonRequest) returns (DeletePersonReply);
+}
+message PersonReply { string id=1; string first_name=2; string last_name=3; string national_code=4; string birth_date=5; }
+message CreatePersonRequest { string first_name=1; string last_name=2; string national_code=3; string birth_date=4; }
+message GetPersonRequest { string id=1; }
+message ListPersonsRequest { int32 page=1; int32 page_size=2; }
+message ListPersonsReply { repeated PersonReply persons=1; }
+message UpdatePersonRequest { string id=1; string first_name=2; string last_name=3; string national_code=4; string birth_date=5; }
+message DeletePersonRequest { string id=1; }
+message DeletePersonReply { bool deleted=1; }

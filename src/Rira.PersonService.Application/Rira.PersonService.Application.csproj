@@ -1,0 +1,1 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup><ItemGroup><ProjectReference Include="../Rira.PersonService.Domain/Rira.PersonService.Domain.csproj" /><PackageReference Include="FluentValidation" Version="11.11.0" /><PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" /></ItemGroup></Project>
