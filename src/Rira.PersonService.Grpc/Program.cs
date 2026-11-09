@@ -12,11 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // تنظیم gRPC و اینترسپتور مدیریت خطاها
 builder.Services.AddGrpc(o => o.Interceptors.Add<ExceptionHandlingInterceptor>());
+builder.Services.AddGrpcReflection();
 
-// تنظیم پایگاه داده روی SQL Server (با استفاده از ConnectionString یا مقدار پیش‌فرض لوکال)
-builder.Services.AddDbContext<AppDbContext>(o =>
-	o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-				   ?? "Server=.;Database=RiraPersonDb;Trusted_Connection=True;TrustServerCertificate=True;"));
+// تنظیم پایگاه داده SQL Server
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=127.0.0.1;Database=RiraPersonDb;User Id=sa;Password=*******;TrustServerCertificate=True;";
+
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(connectionString));
 
 // ثبت وابستگی‌ها (DI)
 builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
@@ -35,16 +37,21 @@ builder.Services.AddScoped<IValidator<UpdatePerson.Command>, UpdatePersonValidat
 
 var app = builder.Build();
 
-// اعمال خودکار مایگریشن‌ها هنگام بالا آمدن اپلیکیشن در SQL Server
+// اعمال خودکار مایگریشن‌ها در استارتاپ
 using (var scope = app.Services.CreateScope())
 {
-	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-	await db.Database.MigrateAsync();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
 }
 
-// مپ کردن سرویس‌های gRPC و اندپوینت تست
+// مپ کردن سرویس‌ها
+if (app.Environment.IsDevelopment())
+{
+    app.MapGrpcReflectionService();
+}
+
 app.MapGrpcService<PersonGrpcService>();
-app.MapGet("/", () => "Rira PersonService gRPC endpoint. Use a gRPC client.");
+app.MapGet("/", () => "Rira PersonService gRPC endpoint is running. Use a gRPC client.");
 
 app.Run();
 
