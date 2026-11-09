@@ -15,8 +15,9 @@ builder.Services.AddGrpc(o => o.Interceptors.Add<ExceptionHandlingInterceptor>()
 builder.Services.AddGrpcReflection();
 
 // تنظیم پایگاه داده SQL Server
+// تنظیم پایگاه داده SQL Server از طریق appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=127.0.0.1;Database=RiraPersonDb;User Id=sa;Password=*******;TrustServerCertificate=True;";
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(connectionString));
 
